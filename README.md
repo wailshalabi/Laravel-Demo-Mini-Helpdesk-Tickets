@@ -173,3 +173,16 @@ A `phpMyAdmin` service is available in the Compose setup to inspect the database
 You can also use the application DB user defined in `src/.env` (for example `laravel` / `secret`).
 
 Security note: phpMyAdmin is provided for local development convenience only — do not expose it to public networks or production environments. If port `8081` conflicts with another service, change the host mapping in `docker-compose.yml`.
+
+---
+
+## Security disclaimer
+
+This project is for educational purposes only.
+Do not use this implementation directly in production. Real systems should use secure key management, durable refresh token storage, and proper monitoring.
+
+---
+
+## License
+
+This demo is provided as-is for learning and experimentation.
