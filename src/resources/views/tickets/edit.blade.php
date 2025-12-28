@@ -4,7 +4,7 @@
 <div class="card">
   <h2>Edit ticket</h2>
 
-  <form method="POST" action="{{ route('tickets.update',$ticket) }}">
+  <form data-disable-on-submit method="POST" action="{{ route('tickets.update',$ticket) }}">
     @csrf
     @method('PUT')
 

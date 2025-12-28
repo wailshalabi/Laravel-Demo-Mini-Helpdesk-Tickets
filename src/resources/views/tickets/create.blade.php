@@ -4,7 +4,7 @@
 <div class="card">
   <h2>Create ticket</h2>
 
-  <form method="POST" action="{{ route('tickets.store') }}">
+  <form data-disable-on-submit method="POST" action="{{ route('tickets.store') }}">
     @csrf
 
     <div class="grid">
