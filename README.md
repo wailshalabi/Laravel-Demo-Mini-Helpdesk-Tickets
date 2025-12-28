@@ -28,6 +28,22 @@ make up
 make install
 ```
 
+Before running `make install`, create your environment config file from the example if you don't already have one:
+
+Unix / macOS:
+
+```bash
+cp src/.env.example src/.env
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item src\.env.example src\.env
+```
+
+After creating the `.env` file you can edit any environment values (ports, DB credentials, etc.) as needed.
+
 Open the app at: http://localhost:8080
 
 Mail UI (Mailpit): http://localhost:8025
@@ -91,6 +107,47 @@ If you want, I can also:
 
 ---
 
-File: `README.md`
+```powershell
 php artisan test
 ```
+
+## Setup & Permissions (storage folders)
+
+The application requires writable `storage` and `bootstrap/cache` directories. The Compose setup uses a named volume for `storage` so the container can manage permissions, but you may still need to ensure correct ownership/permissions inside the container.
+
+Recommended steps after starting the environment:
+
+1. Start containers:
+
+```powershell
+docker compose up -d --build
+```
+
+2. Create required folders (if missing) and set ownership/permissions from the `app` container:
+
+```powershell
+docker compose exec app sh -c "mkdir -p storage/framework/{sessions,views,cache} bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache && chmod -R 775 storage bootstrap/cache"
+```
+
+3. Run the Laravel storage link and other setup tasks:
+
+```powershell
+docker compose exec app php artisan storage:link
+docker compose exec app composer install
+docker compose exec app php artisan migrate --seed
+```
+
+Notes:
+
+- If you also use the `worker` or `scheduler` containers and they are not sharing the same named `app_storage` volume for `storage`, run the `chown` command in those containers too:
+
+```powershell
+docker compose exec worker sh -c "chown -R www-data:www-data storage bootstrap/cache"
+docker compose exec scheduler sh -c "chown -R www-data:www-data storage bootstrap/cache"
+```
+
+- On Windows hosts with bind mounts, `chown` may have no effect because the host filesystem manages permissions. This Compose setup already uses a named volume for `storage` (`app_storage`), so the above `chown` should work. If you still experience permission issues on Windows, try using the named volume (ensure `app_storage` is mounted) or run the commands inside the container as shown above.
+
+- The project's Dockerfile already sets ownership for `storage` and `bootstrap/cache` at build time, but running the `chown` command at runtime ensures correct permissions if volumes were recreated or mounted from the host.
+
+If you'd like, I can add a small `scripts/` helper or Makefile target that runs these commands for your platform.
