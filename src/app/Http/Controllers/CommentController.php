@@ -18,7 +18,7 @@ class CommentController extends Controller
         $this->authorize('view', $ticket);
 
         $data = $request->validate([
-            'body' => ['required','string','max:2000'],
+            'body' => ['required', 'string', 'max:2000'],
         ]);
 
         Comment::create([

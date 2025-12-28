@@ -20,9 +20,9 @@ class TicketApiController extends Controller
         $user = $request->user();
 
         $tickets = Ticket::query()
-            ->when(!$user->isAdmin(), function ($q) use ($user) {
+            ->when(! $user->isAdmin(), function ($q) use ($user) {
                 $q->where('created_by', $user->id)
-                  ->orWhere('assigned_to', $user->id);
+                    ->orWhere('assigned_to', $user->id);
             })
             ->latest()
             ->paginate(10);
@@ -35,10 +35,10 @@ class TicketApiController extends Controller
         $this->authorize('create', Ticket::class);
 
         $data = $request->validate([
-            'title' => ['required','string','max:255'],
-            'body' => ['required','string'],
-            'priority' => ['required','in:low,medium,high'],
-            'assigned_to' => ['nullable','exists:users,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'body' => ['required', 'string'],
+            'priority' => ['required', 'in:low,medium,high'],
+            'assigned_to' => ['nullable', 'exists:users,id'],
         ]);
 
         $ticket = Ticket::create([
@@ -58,7 +58,8 @@ class TicketApiController extends Controller
     public function show(Request $request, Ticket $ticket)
     {
         $this->authorize('view', $ticket);
-        return response()->json($ticket->load(['creator','assignee','comments.user']));
+
+        return response()->json($ticket->load(['creator', 'assignee', 'comments.user']));
     }
 
     public function update(Request $request, Ticket $ticket)
@@ -66,18 +67,18 @@ class TicketApiController extends Controller
         $this->authorize('update', $ticket);
 
         $data = $request->validate([
-            'title' => ['sometimes','string','max:255'],
-            'body' => ['sometimes','string'],
-            'status' => ['sometimes','in:open,in_progress,closed'],
-            'priority' => ['sometimes','in:low,medium,high'],
-            'assigned_to' => ['sometimes','nullable','exists:users,id'],
+            'title' => ['sometimes', 'string', 'max:255'],
+            'body' => ['sometimes', 'string'],
+            'status' => ['sometimes', 'in:open,in_progress,closed'],
+            'priority' => ['sometimes', 'in:low,medium,high'],
+            'assigned_to' => ['sometimes', 'nullable', 'exists:users,id'],
         ]);
 
-        if (!$request->user()->isAdmin()) {
+        if (! $request->user()->isAdmin()) {
             unset($data['assigned_to']);
         }
 
-        $ticket->update($data);
+        $ticket->update($request->only(['title', 'body', 'status']));
 
         return response()->json($ticket);
     }
@@ -86,6 +87,7 @@ class TicketApiController extends Controller
     {
         $this->authorize('delete', $ticket);
         $ticket->delete();
+
         return response()->json(['ok' => true]);
     }
 }

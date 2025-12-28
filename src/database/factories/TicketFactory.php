@@ -15,8 +15,8 @@ class TicketFactory extends Factory
 
     public function definition(): array
     {
-        $statuses = ['open','in_progress','closed'];
-        $priorities = ['low','medium','high'];
+        $statuses = ['open', 'in_progress', 'closed'];
+        $priorities = ['low', 'medium', 'high'];
 
         return [
             'title' => $this->faker->sentence(6),

@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 class CloseStaleTickets extends Command
 {
     protected $signature = 'tickets:close-stale';
+
     protected $description = 'Close open tickets older than 30 days (demo scheduled task)';
 
     public function handle(): int
@@ -18,6 +19,7 @@ class CloseStaleTickets extends Command
             ->update(['status' => 'closed']);
 
         $this->info("Closed {$count} stale tickets.");
+
         return self::SUCCESS;
     }
 }

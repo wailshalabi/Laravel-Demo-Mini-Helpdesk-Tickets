@@ -15,8 +15,8 @@ class TicketPolicy
     public function view(User $user, Ticket $ticket): bool
     {
         return $user->isAdmin()
-            || $ticket->created_by === $user->id
-            || $ticket->assigned_to === $user->id;
+            || $ticket->created_by === $user->get('id')
+            || $ticket->assigned_to === $user->get('id');
     }
 
     public function create(User $user): bool
@@ -27,8 +27,8 @@ class TicketPolicy
     public function update(User $user, Ticket $ticket): bool
     {
         return $user->isAdmin()
-            || $ticket->created_by === $user->id
-            || ($user->isAgent() && $ticket->assigned_to === $user->id);
+            || $ticket->created_by === $user->get('id')
+            || ($user->isAgent() && $ticket->assigned_to === $user->get('id'));
     }
 
     public function delete(User $user, Ticket $ticket): bool

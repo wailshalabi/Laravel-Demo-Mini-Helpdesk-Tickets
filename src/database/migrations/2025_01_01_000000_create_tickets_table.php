@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
 
-            $table->index(['status','priority']);
+            $table->index(['status', 'priority']);
         });
 
         Schema::create('comments', function (Blueprint $table) {

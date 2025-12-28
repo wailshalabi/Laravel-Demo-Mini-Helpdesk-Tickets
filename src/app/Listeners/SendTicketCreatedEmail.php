@@ -13,7 +13,7 @@ class SendTicketCreatedEmail implements ShouldQueue
     {
         $ticket = $event->ticket;
 
-        if (!$ticket->assignee?->email) {
+        if (! $ticket->assignee?->email) {
             return;
         }
 

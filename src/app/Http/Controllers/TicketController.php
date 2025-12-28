@@ -21,9 +21,9 @@ class TicketController extends Controller
         $user = auth()->user();
 
         $tickets = Ticket::query()
-            ->when(!$user->isAdmin(), function ($q) use ($user) {
+            ->when(! $user->isAdmin(), function ($q) use ($user) {
                 $q->where('created_by', $user->id)
-                  ->orWhere('assigned_to', $user->id);
+                    ->orWhere('assigned_to', $user->id);
             })
             ->latest()
             ->paginate(10);
@@ -31,15 +31,17 @@ class TicketController extends Controller
         $stats = Cache::remember("dashboard_stats_user_{$user->id}", 30, function () use ($user) {
             $baseQuery = function () use ($user) {
                 $q = Ticket::query();
-                if (!$user->isAdmin()) {
+                if (! $user->isAdmin()) {
                     $q->where('created_by', $user->id)->orWhere('assigned_to', $user->id);
                 }
+
                 return $q;
             };
+
             return [
-                'open' => $baseQuery()->where('status','open')->count(),
-                'in_progress' => $baseQuery()->where('status','in_progress')->count(),
-                'closed' => $baseQuery()->where('status','closed')->count(),
+                'open' => $baseQuery()->where('status', 'open')->count(),
+                'in_progress' => $baseQuery()->where('status', 'in_progress')->count(),
+                'closed' => $baseQuery()->where('status', 'closed')->count(),
             ];
         });
 
@@ -49,7 +51,8 @@ class TicketController extends Controller
     public function create()
     {
         $this->authorize('create', Ticket::class);
-        $agents = User::whereIn('role', ['agent','admin'])->orderBy('name')->get();
+        $agents = User::whereIn('role', ['agent', 'admin'])->orderBy('name')->get();
+
         return view('tickets.create', compact('agents'));
     }
 
@@ -58,10 +61,10 @@ class TicketController extends Controller
         $this->authorize('create', Ticket::class);
 
         $data = $request->validate([
-            'title' => ['required','string','max:255'],
-            'body' => ['required','string'],
-            'priority' => ['required','in:low,medium,high'],
-            'assigned_to' => ['nullable','exists:users,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'body' => ['required', 'string'],
+            'priority' => ['required', 'in:low,medium,high'],
+            'assigned_to' => ['nullable', 'exists:users,id'],
         ]);
 
         $ticket = Ticket::create([
@@ -81,15 +84,17 @@ class TicketController extends Controller
     public function show(Ticket $ticket)
     {
         $this->authorize('view', $ticket);
-        $ticket->load(['creator','assignee','comments.user']);
+        $ticket->load(['creator', 'assignee', 'comments.user']);
+
         return view('tickets.show', compact('ticket'));
     }
 
     public function edit(Ticket $ticket)
     {
         $this->authorize('update', $ticket);
-        $agents = User::whereIn('role', ['agent','admin'])->orderBy('name')->get();
-        return view('tickets.edit', compact('ticket','agents'));
+        $agents = User::whereIn('role', ['agent', 'admin'])->orderBy('name')->get();
+
+        return view('tickets.edit', compact('ticket', 'agents'));
     }
 
     public function update(Request $request, Ticket $ticket)
@@ -97,15 +102,15 @@ class TicketController extends Controller
         $this->authorize('update', $ticket);
 
         $data = $request->validate([
-            'title' => ['required','string','max:255'],
-            'body' => ['required','string'],
-            'status' => ['required','in:open,in_progress,closed'],
-            'priority' => ['required','in:low,medium,high'],
-            'assigned_to' => ['nullable','exists:users,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'body' => ['required', 'string'],
+            'status' => ['required', 'in:open,in_progress,closed'],
+            'priority' => ['required', 'in:low,medium,high'],
+            'assigned_to' => ['nullable', 'exists:users,id'],
         ]);
 
         // Only admins can change assignment
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             unset($data['assigned_to']);
         }
 
@@ -118,6 +123,7 @@ class TicketController extends Controller
     {
         $this->authorize('delete', $ticket);
         $ticket->delete();
+
         return redirect()->route('tickets.index')->with('ok', 'Ticket deleted.');
     }
 }

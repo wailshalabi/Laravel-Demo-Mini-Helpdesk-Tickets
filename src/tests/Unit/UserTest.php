@@ -16,7 +16,7 @@ class UserTest extends TestCase
         dump([
             'env' => app()->environment(),
             'db_default' => config('database.default'),
-            'db_name' => config('database.connections.' . config('database.default') . '.database'),
+            'db_name' => config('database.connections.'.config('database.default').'.database'),
         ]);
 
         $admin = User::factory()->create(['role' => 'admin']);
