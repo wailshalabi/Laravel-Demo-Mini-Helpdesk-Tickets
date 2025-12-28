@@ -151,3 +151,14 @@ docker compose exec scheduler sh -c "chown -R www-data:www-data storage bootstra
 - The project's Dockerfile already sets ownership for `storage` and `bootstrap/cache` at build time, but running the `chown` command at runtime ensures correct permissions if volumes were recreated or mounted from the host.
 
 If you'd like, I can add a small `scripts/` helper or Makefile target that runs these commands for your platform.
+
+## phpMyAdmin (local development)
+
+A `phpMyAdmin` service is available in the Compose setup to inspect the database during local development.
+
+- **URL:** http://localhost:8081
+- **Login (local dev):** `root` / `rootsecret`
+
+You can also use the application DB user defined in `src/.env` (for example `laravel` / `secret`).
+
+Security note: phpMyAdmin is provided for local development convenience only — do not expose it to public networks or production environments. If port `8081` conflicts with another service, change the host mapping in `docker-compose.yml`.
