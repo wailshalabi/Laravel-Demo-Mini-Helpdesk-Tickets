@@ -21,7 +21,7 @@ class TicketController extends Controller
         $user = auth()->user();
 
         $tickets = Ticket::query()
-            ->when(! $user->isAdmin(), function ($q) use ($user) {
+            ->when(!$user->isAdmin(), function ($q) use ($user) {
                 $q->where('created_by', $user->id)
                     ->orWhere('assigned_to', $user->id);
             })
@@ -31,7 +31,7 @@ class TicketController extends Controller
         $stats = Cache::remember("dashboard_stats_user_{$user->id}", 30, function () use ($user) {
             $baseQuery = function () use ($user) {
                 $q = Ticket::query();
-                if (! $user->isAdmin()) {
+                if (!$user->isAdmin()) {
                     $q->where('created_by', $user->id)->orWhere('assigned_to', $user->id);
                 }
 
@@ -110,11 +110,23 @@ class TicketController extends Controller
         ]);
 
         // Only admins can change assignment
-        if (! auth()->user()->isAdmin()) {
+        if (!auth()->user()->isAdmin()) {
             unset($data['assigned_to']);
         }
 
         $ticket->update($data);
+
+        $changes = [];
+        foreach (['status', 'priority', 'assigned_to', 'title'] as $field) {
+            if (($before[$field] ?? null) !== ($ticket->$field ?? null)) {
+                $changes[$field] = [
+                    'old' => $before[$field] ?? null,
+                    'new' => $ticket->$field ?? null,
+                ];
+            }
+        }
+
+        event(new \App\Events\TicketUpdated($ticket, $changes));
 
         return redirect()->route('tickets.show', $ticket)->with('ok', 'Ticket updated.');
     }
