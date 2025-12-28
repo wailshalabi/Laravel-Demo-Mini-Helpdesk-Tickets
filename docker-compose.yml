@@ -15,8 +15,8 @@ services:
       context: ./docker/php
     volumes:
       - ./src:/var/www/html:delegated
-      - app_storage:/var/www/html/storage
-      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+      - app_writable:/var/www/html/storage
+      - app_writable:/var/www/html/bootstrap/cache
     depends_on:
       - db
       - redis
@@ -29,8 +29,8 @@ services:
     command: ["php", "artisan", "queue:work", "--sleep=1", "--tries=3", "--timeout=90"]
     volumes:
       - ./src:/var/www/html:delegated
-      - app_storage:/var/www/html/storage
-      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+      - app_writable:/var/www/html/storage
+      - app_writable:/var/www/html/bootstrap/cache
     depends_on:
       - app
       - redis
@@ -43,8 +43,8 @@ services:
     command: ["sh", "-lc", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
     volumes:
       - ./src:/var/www/html:delegated
-      - app_storage:/var/www/html/storage
-      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+      - app_writable:/var/www/html/storage
+      - app_writable:/var/www/html/bootstrap/cache
     depends_on:
       - app
       - db
@@ -91,10 +91,22 @@ services:
       - db
     networks: [appnet]
 
+  node:
+    image: node:20-alpine
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_HOST=0.0.0.0
+      - VITE_PORT=5173
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+
 networks:
   appnet:
 
 volumes:
   dbdata:
-  app_storage:
-  app_bootstrap_cache:
+  app_writable:

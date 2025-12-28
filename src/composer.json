@@ -2,7 +2,12 @@
   "name": "demo/laravel-docker-tickets",
   "type": "project",
   "description": "Dockerized Laravel tickets demo app",
-  "keywords": ["laravel", "docker", "demo", "tickets"],
+  "keywords": [
+    "laravel",
+    "docker",
+    "demo",
+    "tickets"
+  ],
   "license": "MIT",
   "require": {
     "php": "^8.3",
