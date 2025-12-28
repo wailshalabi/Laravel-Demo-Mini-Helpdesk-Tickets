@@ -92,6 +92,12 @@ curl http://localhost:8080/api/tickets \
 make test
 ```
 
+- To format the code using Pint with Docker
+
+```powershell
+docker compose exec app ./vendor/bin/pint
+```
+
 ### No `make` installed?
 
 If your development machine doesn't have `make` available, you can run the equivalent Docker Compose commands directly. Below are the common `Makefile` targets and their `docker compose` equivalents:
