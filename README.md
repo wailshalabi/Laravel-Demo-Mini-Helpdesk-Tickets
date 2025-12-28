@@ -22,6 +22,17 @@ Key features:
 make up
 ```
 
+Note:
+
+The `worker` container runs `php artisan queue:work` and requires Composer dependencies. On a fresh clone, if `vendor/` is missing, the worker may exit. You can run the commands manually or move to step 2 to install dependencies and then restart the services.
+
+```bash
+docker compose exec app composer install
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
+docker compose restart worker
+```
+
 2. Install dependencies and prepare the app (run once):
 
 ```powershell
