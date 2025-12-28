@@ -5,3 +5,4 @@
 /src/storage/framework
 /src/storage/logs
 dbdata
+.phpunit.result.cache
